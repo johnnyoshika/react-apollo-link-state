@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 
+import './App.css';
+
 const GET_REPOSITORIES_OF_ORGANIZATION = gql`
   {
     organization(login: "the-road-to-learn-react") {
@@ -52,8 +54,12 @@ const RepositoryList = ({
   <ul>
     {repositories.edges.map(({ node }) => {
       const isSelected = selectedRepositoryIds.includes(node.id);
+      const rowClassName = ['row'];
+      if (isSelected)
+        rowClassName.push('row_selected');
+
       return (
-        <li key={node.id}>
+        <li className={rowClassName.join(' ')} key={node.id}>
           <Select
             id={node.id}
             isSelected={isSelected}
