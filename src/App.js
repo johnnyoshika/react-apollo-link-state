@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 
@@ -48,8 +48,7 @@ const App = () => {
 
 const RepositoryList = ({
   repositories,
-  selectedRepositoryIds,
-  toggleSelectRepository
+  selectedRepositoryIds
 }) => (
   <ul>
     {repositories.edges.map(({ node }) => {
@@ -63,7 +62,6 @@ const RepositoryList = ({
           <Select
             id={node.id}
             isSelected={isSelected}
-            toggleSelectRepository={toggleSelectRepository}
           />{' '}
           <a href={node.url}>{node.name}</a>{' '}
           {!node.viewerHasStarred && <Star id={node.id} />}
@@ -87,31 +85,48 @@ const Star = ({ id }) => {
   );
 };
 
-const Repositories = ({ repositories }) => {
-  const [selectedRepositoryIds, setSelectedRepositoryIds] = useState([]);
+export const GET_SELECTED_REPOSITORIES = gql`
+  query {
+    selectedRepositoryIds @client
+  }
+`;
 
-  const toggleSelectRepository = (id, isSelected) => {
-    setSelectedRepositoryIds(ids => isSelected
-      ? ids.filter(itemId => itemId !== id)
-      : ids.concat(id));
-  };
+const Repositories = ({ repositories }) => {
+  const { data: { selectedRepositoryIds } } = useQuery(GET_SELECTED_REPOSITORIES);
 
   return (
     <RepositoryList
       repositories={repositories}
       selectedRepositoryIds={selectedRepositoryIds}
-      toggleSelectRepository={toggleSelectRepository}
     />
   );
 };
 
-const Select = ({ id, isSelected, toggleSelectRepository }) => (
-  <button
-    type="button"
-    onClick={() => toggleSelectRepository(id, isSelected)}
-  >
-    {isSelected ? 'Unselect' : 'Select'}
-  </button>
-);
+const SELECT_REPOSITORY = gql`
+  mutation($id: ID!, $isSelected: Boolean!) {
+    toggleSelectRepository(id: $id, isSelected: $isSelected) @client {
+      id
+      isSelected
+    }
+  }
+`;
+
+const Select = ({ id, isSelected }) => {
+  const [toggleSelectRepository] = useMutation(SELECT_REPOSITORY, {
+    variables: {
+      id,
+      isSelected
+    }
+  });
+
+  return (
+    <button
+      type="button"
+      onClick={toggleSelectRepository}
+    >
+      {isSelected ? 'Unselect' : 'Select'}
+    </button>
+  );
+};
 
 export default App;
