@@ -10,3 +10,7 @@
 .row_selected:hover {
   background-color: orange;
 }
+
+.text-center {
+  text-align: center;
+}

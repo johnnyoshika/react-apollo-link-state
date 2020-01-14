@@ -4,7 +4,7 @@ import { useQuery, useMutation } from '@apollo/react-hooks';
 
 import './App.css';
 
-const GET_REPOSITORIES_OF_ORGANIZATION = gql`
+export const GET_REPOSITORIES_OF_ORGANIZATION = gql`
   {
     organization(login: "the-road-to-learn-react") {
       repositories(first: 20) {
@@ -91,14 +91,34 @@ export const GET_SELECTED_REPOSITORIES = gql`
   }
 `;
 
+const SELECT_ALL_REPOSITORIES = gql`
+  mutation {
+    selectAllRepositories @client
+  }
+`;
+
+const UNSELECT_ALL_REPOSITORIES = gql`
+  mutation {
+    unSelectAllRepositories @client
+  }
+`;
+
 const Repositories = ({ repositories }) => {
   const { data: { selectedRepositoryIds } } = useQuery(GET_SELECTED_REPOSITORIES);
+  const [selectAllRepositories] = useMutation(SELECT_ALL_REPOSITORIES);
+  const [unSelectAllRepositories] = useMutation(UNSELECT_ALL_REPOSITORIES);
 
   return (
-    <RepositoryList
-      repositories={repositories}
-      selectedRepositoryIds={selectedRepositoryIds}
-    />
+    <>
+      <div className="text-center">
+        <button type="button" onClick={selectAllRepositories}>Select All</button>
+        <button type="button" onClick={unSelectAllRepositories}>Unselect All</button>
+      </div>
+      <RepositoryList
+        repositories={repositories}
+        selectedRepositoryIds={selectedRepositoryIds}
+      />
+    </>
   );
 };
 

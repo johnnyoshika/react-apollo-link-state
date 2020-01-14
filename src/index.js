@@ -7,7 +7,7 @@ import { HttpLink } from 'apollo-link-http';
 import { withClientState } from 'apollo-link-state';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import './index.css';
-import App, { GET_SELECTED_REPOSITORIES } from './App';
+import App, { GET_REPOSITORIES_OF_ORGANIZATION, GET_SELECTED_REPOSITORIES } from './App';
 import * as serviceWorker from './serviceWorker';
 
 const initialState = {
@@ -31,13 +31,37 @@ const toggleSelectRepository = (_, { id, isSelected }, { cache }) => {
   return { id, isSelected: !isSelected };
 };
 
+const selectAllRepositories = (_, __, { cache }) => {
+  let { organization: { repositories: { edges } } } = cache.readQuery({
+    query: GET_REPOSITORIES_OF_ORGANIZATION
+  });
+
+  cache.writeQuery({
+    query: GET_SELECTED_REPOSITORIES,
+    data: {
+      selectedRepositoryIds: edges.map(edge => edge.node.id)
+    }
+  });
+};
+
+const unSelectAllRepositories = (_, __, { cache }) => {
+  cache.writeQuery({
+    query: GET_SELECTED_REPOSITORIES,
+    data: {
+      selectedRepositoryIds: []
+    }
+  });
+};
+
 const cache = new InMemoryCache();
 const stateLink = withClientState({
   cache,
   defaults: initialState,
   resolvers: {
     Mutation: {
-      toggleSelectRepository
+      toggleSelectRepository,
+      selectAllRepositories,
+      unSelectAllRepositories
     }
   }
 });
