@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 
@@ -44,14 +44,26 @@ const App = () => {
   );
 };
 
-const RepositoryList = ({ repositories }) => (
+const RepositoryList = ({
+  repositories,
+  selectedRepositoryIds,
+  toggleSelectRepository
+}) => (
   <ul>
-    {repositories.edges.map(({ node }) => (
-      <li key={node.id}>
-        <a href={node.url}>{node.name}</a>{' '}
-        {!node.viewerHasStarred && <Star id={node.id} />}
-      </li>
-    ))}
+    {repositories.edges.map(({ node }) => {
+      const isSelected = selectedRepositoryIds.includes(node.id);
+      return (
+        <li key={node.id}>
+          <Select
+            id={node.id}
+            isSelected={isSelected}
+            toggleSelectRepository={toggleSelectRepository}
+          />{' '}
+          <a href={node.url}>{node.name}</a>{' '}
+          {!node.viewerHasStarred && <Star id={node.id} />}
+        </li>
+      );
+    })}
   </ul>
 );
 
@@ -70,9 +82,30 @@ const Star = ({ id }) => {
 };
 
 const Repositories = ({ repositories }) => {
+  const [selectedRepositoryIds, setSelectedRepositoryIds] = useState([]);
+
+  const toggleSelectRepository = (id, isSelected) => {
+    setSelectedRepositoryIds(ids => isSelected
+      ? ids.filter(itemId => itemId !== id)
+      : ids.concat(id));
+  };
+
   return (
-    <RepositoryList repositories={repositories} />
+    <RepositoryList
+      repositories={repositories}
+      selectedRepositoryIds={selectedRepositoryIds}
+      toggleSelectRepository={toggleSelectRepository}
+    />
   );
 };
+
+const Select = ({ id, isSelected, toggleSelectRepository }) => (
+  <button
+    type="button"
+    onClick={() => toggleSelectRepository(id, isSelected)}
+  >
+    {isSelected ? 'Unselect' : 'Select'}
+  </button>
+);
 
 export default App;
