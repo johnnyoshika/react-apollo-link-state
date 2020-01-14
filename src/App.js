@@ -40,7 +40,7 @@ const App = () => {
   if (!organization) return <div>Loading ...</div>;
 
   return (
-    <RepositoryList repositories={organization.repositories} />
+    <Repositories repositories={organization.repositories} />
   );
 };
 
@@ -66,6 +66,12 @@ const Star = ({ id }) => {
     <button type="button" onClick={addStar}>
       Star
     </button>
+  );
+};
+
+const Repositories = ({ repositories }) => {
+  return (
+    <RepositoryList repositories={repositories} />
   );
 };
 
