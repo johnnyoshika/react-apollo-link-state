@@ -40,9 +40,7 @@ const App = () => {
   if (!organization) return <div>Loading ...</div>;
 
   return (
-    <div>
-      <RepositoryList repositories={organization.repositories} />
-    </div>
+    <RepositoryList repositories={organization.repositories} />
   );
 };
 
