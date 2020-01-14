@@ -111,8 +111,12 @@ const Repositories = ({ repositories }) => {
   return (
     <>
       <div className="text-center">
-        <button type="button" onClick={selectAllRepositories}>Select All</button>
-        <button type="button" onClick={unSelectAllRepositories}>Unselect All</button>
+        {selectedRepositoryIds.length !== repositories.edges.length && (
+          <button type="button" onClick={selectAllRepositories}>Select All</button>
+        )}
+        {selectedRepositoryIds.length !== 0 && (
+          <button type="button" onClick={unSelectAllRepositories}>Unselect All</button>
+        )}
       </div>
       <RepositoryList
         repositories={repositories}
