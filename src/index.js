@@ -10,10 +10,14 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+const initialState = {
+  selectedRepositoryIds: ['MDEwOlJlcG9zaXRvcnk2MzM1MjkwNw==']
+};
+
 const cache = new InMemoryCache();
 const stateLink = withClientState({
   cache,
-  defaults: {},
+  defaults: initialState,
   resolvers: {},
 });
 
